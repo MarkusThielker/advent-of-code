@@ -12,6 +12,7 @@ func main() {
 	part1 := func(input []string) (result int) {
 
 		for _, card := range input {
+
 			parts := strings.Split(card, "|")
 			winningNumbers := toIntSlice(strings.Fields(strings.Split(parts[0], ":")[1]))
 			cardNumbers := toIntSlice(strings.Fields(parts[1]))
@@ -38,7 +39,35 @@ func main() {
 	}
 
 	part2 := func(input []string) (result int) {
-		return len(input)
+
+		// assign each card a count of 1
+		cardCounts := make(map[int]int)
+		for index := range input {
+			cardCounts[index] = 1
+		}
+
+		// iterate over each card
+		for cardNumber, card := range input {
+
+			parts := strings.Split(card, "|")
+			winningNumbers := toIntSlice(strings.Fields(strings.Split(parts[0], ":")[1]))
+			cardNumbers := toIntSlice(strings.Fields(parts[1]))
+
+			wins := 0
+			for _, num := range cardNumbers {
+				if contains(winningNumbers, num) {
+					wins++
+				}
+			}
+
+			for i := 0; i < wins; i++ {
+				nextIndex := cardNumber + (i + 1)
+				currentCardWins := cardCounts[cardNumber]
+				cardCounts[nextIndex] = cardCounts[nextIndex] + currentCardWins
+			}
+		}
+
+		return sumIntValues(cardCounts)
 	}
 
 	input := utils.ReadInput("day-04/input")
@@ -66,4 +95,12 @@ func contains(slice []int, val int) bool {
 		}
 	}
 	return false
+}
+
+func sumIntValues(m map[int]int) (sum int) {
+	sum = 0
+	for _, v := range m {
+		sum += v
+	}
+	return
 }
